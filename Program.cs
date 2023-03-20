@@ -11,16 +11,10 @@
         {
             string lastFileName = "address.txt";
             string[] commandLine;
+            
             Console.WriteLine("Hello and welcome to the contact list");
-            Console.WriteLine("Avaliable commands: ");
-            Console.WriteLine("  load        - load contact list data from the file address.lis");
-            Console.WriteLine("  load /file/ - load contact list data from the file");
-            Console.WriteLine("  new        - create new person");
-            Console.WriteLine("  new /persname/ /surname/ - create new person with personal name and surname");
-            Console.WriteLine("  quit        - quit the program");
-            Console.WriteLine("  save         - save contact list data to the file previously loaded");
-            Console.WriteLine("  save /file/ - save contact list data to the file");
-            Console.WriteLine();
+            PrintHelp(); //Prints available commands
+
             do
             {
                 Console.Write($"> ");
@@ -40,35 +34,15 @@
                     else
                     {
                         lastFileName = commandLine[1];
-                        using (StreamReader infile = new StreamReader(lastFileName))
-                        {
-                            string line;
-                            while ((line = infile.ReadLine()) != null)
-                            {
-                                Console.WriteLine(line);
-                                string[] attrs = line.Split('|');
-                                Person p = new Person();
-                                p.persname = attrs[0];
-                                p.surname = attrs[1];
-                                string[] phones = attrs[2].Split(';');
-                                p.phone = phones[0];
-                                string[] addresses = attrs[3].Split(';');
-                                p.address = addresses[0];
-                                for (int ix = 0; ix < contactList.Length; ix++)
-                                {
-                                    if (contactList[ix] == null)
-                                    {
-                                        contactList[ix] = p;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
+                        LoadFile(lastFileName);
                     }
                 }
                 else if (commandLine[0] == "save")
                 {
                     Save(lastFileName, commandLine);
+                    //FIXME Save command writes over file if nothing loaded
+                    //FIXME Writes over if several numbers, deletes birthdate
+                    //TODO Save file
                 }
                 else if (commandLine[0] == "new")
                 {
@@ -76,13 +50,45 @@
                 }
                 else if (commandLine[0] == "help")
                 {
-                    Help();
+                    PrintHelp();
                 }
+
+                //TODO Delete functions
                 else
                 {
                     Console.WriteLine($"Unknown command: '{commandLine[0]}'");
                 }
             } while (commandLine[0] != "quit");
+        }
+
+
+        private static void LoadFile(string lastFileName)
+        {
+            using (StreamReader infile = new StreamReader(lastFileName))
+            {
+                string line;
+                while ((line = infile.ReadLine()) != null)
+                {
+                    Console.WriteLine(line);
+                    string[] attrs = line.Split('|');
+                    Person p = new Person();
+                    p.persname = attrs[0];
+                    p.surname = attrs[1];
+                    string[] phones = attrs[2].Split(';');
+                    p.phone = phones[0];
+                    string[] addresses = attrs[3].Split(';');
+                    p.address = addresses[0];
+                    p.birthdate = attrs[4];
+                    for (int ix = 0; ix < contactList.Length; ix++)
+                    {
+                        if (contactList[ix] == null)
+                        {
+                            contactList[ix] = p;
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         private static void Load(string lastFileName)
@@ -101,6 +107,7 @@
                     p.phone = phones[0];
                     string[] addresses = attrs[3].Split(';');
                     p.address = addresses[0];
+                    p.birthdate = attrs[4];
                     for (int ix = 0; ix < contactList.Length; ix++)
                     {
                         if (contactList[ix] == null)
@@ -155,7 +162,7 @@
             }
         }
 
-        private static void Help()
+        private static void PrintHelp()
         {
             Console.WriteLine("Avaliable commands: ");
             Console.WriteLine("  delete       - emtpy the contact list");
