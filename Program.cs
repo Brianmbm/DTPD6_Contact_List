@@ -44,6 +44,12 @@
                     //FIXME Writes over if several numbers, deletes birthdate
                     //TODO Save file
                 }
+                /* HACK else if (commandLine[0] == "list")
+                {
+                    foreach (Person p in contactList)
+                    { Console.WriteLine(p.phone); }
+                }
+                */
                 else if (commandLine[0] == "new")
                 {
                     New(commandLine);
@@ -104,7 +110,7 @@
                     p.persname = attrs[0];
                     p.surname = attrs[1];
                     string[] phones = attrs[2].Split(';');
-                    p.phone = phones[0];
+                    p.phone = phones[0];//FIXME Doesnt add all phones
                     string[] addresses = attrs[3].Split(';');
                     p.address = addresses[0];
                     p.birthdate = attrs[4];
@@ -129,7 +135,11 @@
                     foreach (Person p in contactList)
                     {
                         if (p != null)
-                            outfile.WriteLine($"{p.persname}|{p.surname}|{p.phone}|{p.address}|{p.birthdate}");
+                        {
+                            string phones = string.Join(";", p.phone.Split(';'));
+                            string addresses = string.Join(";", p.address.Split(';'));
+                            outfile.WriteLine($"{p.persname}|{p.surname}|{phones}|{addresses}|{p.birthdate}");
+                        }
                     }
                 }
             }
